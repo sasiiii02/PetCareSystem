@@ -4,6 +4,7 @@ import Event from "../models/Event.js";
 export const createEvent = async (req, res) => {
   try {
     const { title, date, time, location, description, eventImageURL } = req.body;
+    const organizerId = req.adminId; // Get organizerId from logged-in admin (from JWT token)
 
     // Validate required fields
     if (!title || !date || !time || !location || !description || !eventImageURL) {
@@ -18,6 +19,7 @@ export const createEvent = async (req, res) => {
       location,
       description,
       eventImageURL,
+      organizerId, // Set organizerId to the logged-in admin's ID
     });
 
     // Save to database
@@ -54,7 +56,7 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
-//get event by id
+// Get event by ID
 export const getEventById = async (req, res) => {
   try {
     const { eventId } = req.params; // Get eventId from the URL params
@@ -83,7 +85,6 @@ export const getEventById = async (req, res) => {
     });
   }
 };
-
 
 // Delete an event
 export const deleteEvent = async (req, res) => {
@@ -114,11 +115,12 @@ export const deleteEvent = async (req, res) => {
   }
 };
 
-
+// Update an event
 export const updateEvent = async (req, res) => {
   try {
-    const { eventId } = req.params;  // Get the eventId from URL parameters
+    const { eventId } = req.params; // Get the eventId from URL parameters
     const { title, date, time, location, description, eventImageURL } = req.body;
+    const organizerId = req.adminId; // Get organizerId from logged-in admin (from JWT token)
 
     // Validate required fields
     if (!title || !date || !time || !location || !description || !eventImageURL) {
@@ -127,9 +129,9 @@ export const updateEvent = async (req, res) => {
 
     // Find and update the event by its ID
     const updatedEvent = await Event.findByIdAndUpdate(
-      eventId, 
-      { title, date, time, location, description, eventImageURL },
-      { new: true }  // This option will return the updated document
+      eventId,
+      { title, date, time, location, description, eventImageURL, organizerId }, // Include organizerId in the update
+      { new: true } // This option will return the updated document
     );
 
     // If event is not found

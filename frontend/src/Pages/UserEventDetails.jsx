@@ -3,11 +3,11 @@ import { useParams } from "react-router-dom";
 import EventDetailsHeader from "../Component/EventDetailsHeader";
 import RegisterEventModal from "../Component/RegisterEventModal";
 import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
 
 const UserEventDetailsPage = () => {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
+  const [user, setUser] = useState(null); // New state for user profile
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,24 +15,53 @@ const UserEventDetailsPage = () => {
   const [registrationError, setRegistrationError] = useState(null);
   const [registrationSuccess, setRegistrationSuccess] = useState(null);
 
-  // Fetch event details from backend
+  const token = localStorage.getItem("token");
+
+  // Axios instance with default Authorization header
+  const api = axios.create({
+    baseURL: "http://localhost:5000/api",
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+  });
+
+  // Fetch event details, user profile, and registration status
   useEffect(() => {
-    const fetchEventDetails = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/events/${id}`);
-        setEvent(response.data.event);
+        // Fetch event details
+        const eventResponse = await api.get(`/events/${id}`);
+        setEvent(eventResponse.data.event);
+
+        // Fetch user profile (only if logged in)
+        if (token) {
+          const userResponse = await api.get("/users/profile");
+          setUser(userResponse.data); // { _id, name, email, ... }
+
+          // Check if user is registered
+          const regResponse = await api.get("/registrations");
+          const userRegistrations = regResponse.data.registrations;
+          const isUserRegistered = userRegistrations.some(
+            (reg) => reg.eventId._id === id
+          );
+          setIsRegistered(isUserRegistered);
+        }
       } catch (err) {
         setError(err.response?.data?.message || err.message);
-        console.error("Error fetching event:", err);
+        console.error("Error fetching data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchEventDetails();
-  }, [id]);
+    fetchData();
+  }, [id, token]);
 
   const handleRegisterClick = () => {
+    if (!token) {
+      setRegistrationError("Please log in to register for the event.");
+      return;
+    }
     setIsModalOpen(true);
     setRegistrationError(null);
     setRegistrationSuccess(null);
@@ -41,17 +70,11 @@ const UserEventDetailsPage = () => {
   const handleConfirmRegistration = async (formData) => {
     try {
       const registrationData = {
-        eventId: id, // MongoDB event ID from URL params
-        name: formData.name,
-        email: formData.email,
-        tickets: formData.tickets || 1, // Default to 1 ticket if not specified
-        userId: uuidv4() // Generate a unique user ID for the registration
+        eventId: id,
+        tickets: formData.tickets || 1,
       };
 
-      const response = await axios.post(
-        "http://localhost:5000/api/registrations/register",
-        registrationData
-      );
+      const response = await api.post("/registrations/register", registrationData);
 
       if (response.data.success) {
         setIsRegistered(true);
@@ -63,8 +86,8 @@ const UserEventDetailsPage = () => {
     } catch (err) {
       console.error("Registration error:", err);
       setRegistrationError(
-        err.response?.data?.message || 
-        "An error occurred during registration. Please try again."
+        err.response?.data?.message ||
+          "An error occurred during registration. Please try again."
       );
     }
   };
@@ -113,6 +136,7 @@ const UserEventDetailsPage = () => {
       {isModalOpen && (
         <RegisterEventModal
           event={event}
+          user={user} // Pass user data to modal
           onConfirm={handleConfirmRegistration}
           onClose={() => {
             setIsModalOpen(false);

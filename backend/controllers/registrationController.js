@@ -1,27 +1,57 @@
 import Registration from "../models/Registration.js";
-import { v4 as uuidv4 } from "uuid";
+import User from "../models/User.js";
 
 // Register a user for an event
 export const registerForEvent = async (req, res) => {
   try {
-    const { eventId, name, email, tickets } = req.body;
-
-    // Validate required fields
-    if (!eventId || !name || !email || !tickets) {
-      return res.status(400).json({ success: false, message: "All fields are required." });
+    const { eventId, tickets } = req.body;
+    
+    // Debug: Check what's in req.user
+    console.log('User object from token:', req.user);
+    
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ 
+        success: false, 
+        message: "Authentication required" 
+      });
     }
 
-    const userId = uuidv4(); // Generate a unique user ID for guest users
+    const userId = req.user.userId; // Changed from req.user.id to req.user.userId
+
+    // Validate required fields
+    if (!eventId || !tickets) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Event ID and tickets are required." 
+      });
+    }
+
+    // Check if user is already registered
+    const existingRegistration = await Registration.findOne({ eventId, userId });
+    if (existingRegistration) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "User is already registered for this event." 
+      });
+    }
+
+    // Get user details from database
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
+    }
 
     const newRegistration = new Registration({
       eventId,
       userId,
-      name,
-      email,
+      name: user.name,
+      email: user.email,
       tickets
     });
 
-    // Save registration to database
     await newRegistration.save();
 
     res.status(201).json({
@@ -30,25 +60,28 @@ export const registerForEvent = async (req, res) => {
       registration: newRegistration
     });
   } catch (error) {
-    console.error("Error registering for event:", error);
+    console.error("Full error:", error);
     res.status(500).json({
       success: false,
-      message: "Internal server error. Failed to register for event."
+      message: "Internal server error. Failed to register for event.",
+      error: error.message
     });
   }
 };
 
-// Get all registrations
-export const getAllRegistrations = async (req, res) => {
+// Get all registrations for the logged-in user
+export const getUserRegistrations = async (req, res) => {
   try {
-    const registrations = await Registration.find(); // Fetch all registrations from DB
+    const userId = req.user.userId; // Access userId from logged-in user
+
+    const registrations = await Registration.find({ userId }).populate("eventId", "title date location");
 
     res.status(200).json({
       success: true,
       registrations
     });
   } catch (error) {
-    console.error("Error retrieving registrations:", error);
+    console.error("Error retrieving user registrations:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error. Failed to retrieve registrations."
@@ -59,11 +92,11 @@ export const getAllRegistrations = async (req, res) => {
 // Get all registrations for a specific event
 export const getEventRegistrations = async (req, res) => {
   try {
-    const { eventId } = req.params; // Get eventId from URL params
+    const { eventId } = req.params;
 
-    const registrations = await Registration.find({ eventId });
+    const registrations = await Registration.find({ eventId }).populate("userId", "name email");
 
-    if (registrations.length === 0) {
+    if (!registrations.length) {
       return res.status(404).json({
         success: false,
         message: "No registrations found for this event."
@@ -83,44 +116,18 @@ export const getEventRegistrations = async (req, res) => {
   }
 };
 
-// Get registration by ID
-export const getRegistrationById = async (req, res) => {
-  try {
-    const { registrationId } = req.params; // Get registration ID from URL params
-
-    const registration = await Registration.findById(registrationId);
-
-    if (!registration) {
-      return res.status(404).json({
-        success: false,
-        message: "Registration not found"
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      registration
-    });
-  } catch (error) {
-    console.error("Error retrieving registration:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error. Failed to retrieve registration."
-    });
-  }
-};
-
-// Delete a registration
+// Delete a registration (Only the user who registered can delete)
 export const deleteRegistration = async (req, res) => {
   try {
-    const { registrationId } = req.params; // Get registrationId from URL params
+    const { registrationId } = req.params;
+    const userId = req.user.userId; // Access userId from logged-in user
 
-    const registration = await Registration.findByIdAndDelete(registrationId);
+    const registration = await Registration.findOneAndDelete({ _id: registrationId, userId });
 
     if (!registration) {
       return res.status(404).json({
         success: false,
-        message: "Registration not found"
+        message: "Registration not found or unauthorized to delete"
       });
     }
 
@@ -137,26 +144,43 @@ export const deleteRegistration = async (req, res) => {
   }
 };
 
-// Update registration details (optional)
+// Update registration details (Only the user who registered can update)
 export const updateRegistration = async (req, res) => {
   try {
     const { registrationId } = req.params;
-    const { name, email, tickets } = req.body;
+    const { tickets } = req.body;
+    const userId = req.user.userId; // Changed from req.user.id to req.user.userId
 
-    // Validate required fields
-    if (!name || !email || !tickets) {
-      return res.status(400).json({ message: "All fields are required." });
+    console.log(`Attempting to update registration ${registrationId} for user ${userId}`); // Debug log
+
+    if (!tickets) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Tickets field is required." 
+      });
+    }
+
+    // First verify the registration exists and belongs to user
+    const existingRegistration = await Registration.findOne({
+      _id: registrationId,
+      userId: userId
+    });
+
+    if (!existingRegistration) {
+      console.log(`Registration not found: ${registrationId} for user ${userId}`); // Debug log
+      return res.status(404).json({
+        success: false,
+        message: "Registration not found or unauthorized to update"
+      });
     }
 
     const updatedRegistration = await Registration.findByIdAndUpdate(
       registrationId,
-      { name, email, tickets },
+      { tickets },
       { new: true }
-    );
+    ).populate('eventId', 'title date location'); // Optional: populate event details
 
-    if (!updatedRegistration) {
-      return res.status(404).json({ success: false, message: "Registration not found" });
-    }
+    console.log('Updated registration:', updatedRegistration); // Debug log
 
     res.status(200).json({
       success: true,
@@ -164,10 +188,11 @@ export const updateRegistration = async (req, res) => {
       registration: updatedRegistration
     });
   } catch (error) {
-    console.error("Error updating registration:", error);
+    console.error("Update error:", error);
     res.status(500).json({
       success: false,
-      message: "Internal server error. Failed to update registration."
+      message: "Internal server error. Failed to update registration.",
+      error: error.message
     });
   }
 };

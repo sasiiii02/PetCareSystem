@@ -4,6 +4,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import eventRoutes from "./routes/eventRoutes.js"; // Import event routes
 import registrationRoutes from "./routes/registrationRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 
 dotenv.config();
@@ -26,11 +28,17 @@ mongoose
 
 // Routes
  
+app.use("/api/users", userRoutes);
+app.use("/api/admins", adminRoutes); // Add the admin routes here
 app.use("/api/events", eventRoutes);
 app.use("/api/registrations", registrationRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Something broke!" });
+});
 
 
 // Start server
