@@ -7,11 +7,14 @@ import UserEventDetailsPage from "./Pages/UserEventDetails";
 import UserRegisteredEventsPage from "./Pages/UserRegisteredEventsPage";
 import AboutUs from "./Component/AboutUs";
 import ContactUs from "./Component/ContactUs";
-import Login from "./Pages/Login"; // Your unchanged Login component
-import AdminRedirect from "./Pages/AdminRedirect";
+import Login from "./Pages/Login";
 import PrivateRoute from "./Component/PrivateRoute";
 import AdminLogin from "./Pages/AdminLogin";
-import AdminPrivateRoute from "./Component/AdminPrivateRoute";
+import Success from "./Pages/Success";
+import Cancel from "./Pages/Cancel";
+import AppointmentPrfList from "./Pages/AppointmentPrfList";
+import AppointmentForm from "./Component/AppointmentForm";
+import ProfilePage from "./Component/UserProfileViewAppointment";
 
 const App = () => {
   return (
@@ -20,20 +23,17 @@ const App = () => {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<PetPlatformHomePage />} />
-        <Route path="/login" element={<Login />} /> {/* Optional standalone Login */}
+        <Route path="/login" element={<Login />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/aboutus" element={<AboutUs />} />
         <Route path="/contactus" element={<ContactUs />} />
+        <Route path="/events" element={<UserEventsPage />} />
+        <Route path="/appointment" element={<AppointmentPrfList />} />
+
+
 
         {/* User Protected Routes */}
-        <Route
-          path="/events"
-          element={
-            <PrivateRoute>
-              <UserEventsPage />
-            </PrivateRoute>
-          }
-        />
+     
         <Route
           path="/event/:id"
           element={
@@ -50,14 +50,37 @@ const App = () => {
             </PrivateRoute>
           }
         />
-
-        {/* Admin Protected Route */}
+       
         <Route
-          path="/admin-redirect/:role"
+          path="/appointment-form"
           element={
-            <AdminPrivateRoute>
-              <AdminRedirect />
-            </AdminPrivateRoute>
+            <PrivateRoute>
+              <AppointmentForm />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/success"
+          element={
+            <PrivateRoute>
+              <Success />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/cancel"
+          element={
+            <PrivateRoute>
+              <Cancel />
+            </PrivateRoute>
           }
         />
       </Routes>

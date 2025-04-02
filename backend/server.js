@@ -6,6 +6,7 @@ import eventRoutes from "./routes/eventRoutes.js"; // Import event routes
 import registrationRoutes from "./routes/registrationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import appointmentRoutes from './routes/appointmentRoutes.js';
 import notificationRoutes from "./routes/notificationRoutes.js";
 
 dotenv.config();
@@ -29,7 +30,9 @@ mongoose
 // Routes
  
 app.use("/api/users", userRoutes);
-app.use("/api/admins", adminRoutes); // Add the admin routes here
+app.use("/api/admins", adminRoutes);
+app.use('/api/appointments', appointmentRoutes);
+ // Add the admin routes here
 app.use("/api/events", eventRoutes);
 app.use("/api/registrations", registrationRoutes);
 app.use("/api/notifications", notificationRoutes);

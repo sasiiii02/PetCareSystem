@@ -1,19 +1,9 @@
-import React, { useEffect } from 'react';
+import { Navigate } from "react-router-dom";
 
 const AdminPrivateRoute = ({ children }) => {
-  const token = localStorage.getItem('adminToken');
-  console.log('AdminPrivateRoute - Checking Token:', token);
-
-  useEffect(() => {
-    if (!token) {
-      console.log('No token, redirecting to http://localhost:3000/admin-login');
-      window.location.href = 'http://localhost:3000/admin-login';
-    } else {
-      console.log('Token found, rendering children');
-    }
-  }, [token]);
-
-  return token ? children : null;
+  const token = localStorage.getItem("adminToken");
+  // Redirect to user frontend's admin-login page
+  return token ? children : <Navigate to="http://localhost:3000/admin-login" replace />;
 };
 
 export default AdminPrivateRoute;
