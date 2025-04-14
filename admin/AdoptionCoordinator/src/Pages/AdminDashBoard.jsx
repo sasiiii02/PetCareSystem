@@ -158,7 +158,7 @@ const PetAdoptionDashboard = () => {
     if (window.confirm("Are you sure you want to remove this pet from the adoptable list?")) {
       try {
         setDeleteLoading(true);
-        await axios.delete(`http://localhost:5000/api/foradoption/${petId}`);
+        await axios.delete(`http://localhost:5000/api/adoptablepets/${petId}`);
         // Refresh pet list after successful deletion
         fetchPets();
       } catch (err) {
@@ -167,6 +167,16 @@ const PetAdoptionDashboard = () => {
       } finally {
         setDeleteLoading(false);
       }
+    }
+  };
+
+  const handleCopyPet = async (petId) => {
+    try {
+      const response = await axios.post(`http://localhost:5000/api/movePet/${petId}`);
+      alert(response.data.message); // "Pet moved successfully!"
+    } catch (err) {
+      console.error(err);
+      alert("Failed to copy pet data");
     }
   };
 
@@ -396,9 +406,13 @@ const PetAdoptionDashboard = () => {
 
                   {/* Buttons */}
                   <div className="mt-4 flex space-x-2">
-                    <button className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition">
-                      View Details
-                    </button>
+                  <button 
+                  className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition"
+                  onClick={() => handleCopyPet(pet._id)}
+                >
+                  copy data another table
+                </button>
+
                     <button 
                       className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition"
                       onClick={() => handleDeletePet(pet._id)}

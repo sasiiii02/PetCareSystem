@@ -1,7 +1,7 @@
-const AdoptablePet = require("../models/AdoptablePet");
+import AdoptablePet from "../models/AdoptablePet.js";
 
 // Create Adoptable Pet
-exports.createAdoptablePet = async (req, res) => {
+export const createAdoptablePet = async (req, res) => {
   try {
     const { Pet_Name, Breed, Species, Gender, Age, Pet_Description } = req.body;
     const Pet_Image = req.file ? `/uploads/${req.file.filename}` : null;
@@ -15,7 +15,7 @@ exports.createAdoptablePet = async (req, res) => {
 };
 
 // Get All Adoptable Pets
-exports.getAllAdoptablePets = async (req, res) => {
+export const getAllAdoptablePets = async (req, res) => {
   try {
     const pets = await AdoptablePet.find();
     res.status(200).json(pets);
@@ -25,7 +25,7 @@ exports.getAllAdoptablePets = async (req, res) => {
 };
 
 // Update Adoptable Pet
-exports.updateAdoptablePet = async (req, res) => {
+export const updateAdoptablePet = async (req, res) => {
   try {
     const pet = await AdoptablePet.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.status(200).json(pet);
@@ -35,7 +35,7 @@ exports.updateAdoptablePet = async (req, res) => {
 };
 
 // Delete Adoptable Pet
-exports.deleteAdoptablePet = async (req, res) => {
+export const deleteAdoptablePet = async (req, res) => {
   try {
     await AdoptablePet.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "Adoptable Pet deleted" });

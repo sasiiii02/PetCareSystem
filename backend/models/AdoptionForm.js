@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const adoptionFormSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
@@ -14,4 +14,5 @@ const adoptionFormSchema = new mongoose.Schema({
     additionalInfo: { type: String }
 }, { timestamps: true });
 
-module.exports = mongoose.model('adoptionForm', adoptionFormSchema);
+const AdoptionForm = mongoose.model('adoptionForm', adoptionFormSchema);
+export default AdoptionForm;

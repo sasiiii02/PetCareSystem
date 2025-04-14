@@ -49,46 +49,7 @@ const PawIcon = () => (
 // Expanded initialPets array from second code
 const initialPets = [
   // Dogs
-  {
-    id: 1,
-    name: 'Buddy',
-    type: 'Dog',
-    breed: 'Golden Retriever',
-    age: 3,
-    gender: 'Male',
-    description: 'Friendly and energetic dog looking for an active family.',
-    image: Dog2
-  },
-  {
-    id: 11,
-    name: 'Whiskers',
-    type: 'Cat',
-    breed: 'Tabby',
-    age: 2,
-    gender: 'Female',
-    description: 'Playful and loving cat who enjoys cuddles and sunbathing.',
-    image: Cat1
-  },
-  {
-    id: 2,
-    name: 'Max',
-    type: 'Dog',
-    breed: 'Labrador',
-    age: 5,
-    gender: 'Male',
-    description: 'Calm and well-trained dog perfect for a relaxed household.',
-    image: Dog3
-  },
-  {
-    id: 12,
-    name: 'Oliver',
-    type: 'Cat',
-    breed: 'Siamese',
-    age: 3,
-    gender: 'Male',
-    description: 'Vocal and social cat with striking blue eyes.',
-    image: Cat2
-  }
+
 ];
 
 // Image mapping for default pet images
@@ -97,9 +58,7 @@ const defaultImages = {
   Cat: Cat1
 };
 
-// Map for additional dog and cat images to use randomly if needed
-const dogImages = [Dog2, Dog3, Dog4, Dog5, Dog6, Dog7, Dog8, Dog9, Dog10, Dog11];
-const catImages = [Cat1, Cat2, Cat3, Cat4, Cat5, Cat6, Cat7];
+
 
 const AdoptablePetList = () => {
   const [pets, setPets] = useState(initialPets);

@@ -1,6 +1,6 @@
-const AdoptionForm = require('../models/adoptionForm');
+import AdoptionForm from '../models/adoptionForm.js';
 
-exports.createApplication = async (req, res) => {
+export const createApplication = async (req, res) => {
     try {
         const application = new AdoptionForm(req.body);
         await application.save();
@@ -10,7 +10,7 @@ exports.createApplication = async (req, res) => {
     }
 };
 
-exports.getUserApplications = async (req, res) => {
+export const getUserApplications = async (req, res) => {
     try {
         if (!req.user || !req.user.email) {
             return res.status(401).json({ error: "Unauthorized: User email is missing" });
@@ -23,7 +23,7 @@ exports.getUserApplications = async (req, res) => {
     }
 };
 
-exports.updateApplication = async (req, res) => {
+export const updateApplication = async (req, res) => {
     try {
         const application = await AdoptionForm.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.status(200).json(application);
@@ -32,7 +32,7 @@ exports.updateApplication = async (req, res) => {
     }
 };
 
-exports.deleteApplication = async (req, res) => {
+export const deleteApplication = async (req, res) => {
     try {
         await AdoptionForm.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: 'Application deleted successfully' });
@@ -41,7 +41,7 @@ exports.deleteApplication = async (req, res) => {
     }
 };
 
-exports.getAllApplications = async (req, res) => {
+export const getAllApplications = async (req, res) => {
     try {
         const applications = await AdoptionForm.find();
         res.status(200).json(applications);

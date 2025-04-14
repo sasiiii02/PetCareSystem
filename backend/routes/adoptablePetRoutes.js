@@ -1,11 +1,11 @@
-const express = require("express");
-const multer = require("multer");
-const {
+import express from "express";
+import multer from "multer";
+import {
   createAdoptablePet,
   getAllAdoptablePets,
   updateAdoptablePet,
   deleteAdoptablePet
-} = require("../controllers/adoptablePetControllers");
+} from "../controllers/adoptablePetControllers.js"
 
 const router = express.Router();
 
@@ -22,4 +22,4 @@ router.get("/", getAllAdoptablePets);
 router.put("/:id", updateAdoptablePet);
 router.delete("/:id", deleteAdoptablePet);
 
-module.exports = router;
+export default router;

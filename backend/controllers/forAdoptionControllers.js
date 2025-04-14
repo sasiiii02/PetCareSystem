@@ -1,23 +1,38 @@
-const ForAdoption = require("../models/ForAdoption");
-const multer = require("multer");
-const path = require("path");
+import ForAdoption from "../models/ForAdoption.js";
+import multer from "multer";
+import path from "path";
 
 // Configure multer for image upload
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "uploads/"); // Store images in the 'uploads' folder
+        cb(null, "uploads/");
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Unique filename
+        cb(null, Date.now() + path.extname(file.originalname));
     }
 });
-const upload = multer({ storage });
+export const upload = multer({ storage }); // Export the upload instance
 
 // Add a pet for adoption (with image)
-exports.addPet = async (req, res) => {
+export const addPet = async (req, res) => {
     try {
-        const { ownerFirstName, ownerLastName, email, phone, petName, petAge, petGender, petBreed, petSpecies, petDescription, reason, specialNeeds, vaccinated, neutered } = req.body;
-        
+        const {
+            ownerFirstName,
+            ownerLastName,
+            email,
+            phone,
+            petName,
+            petAge,
+            petGender,
+            petBreed,
+            petSpecies,
+            petDescription,
+            reason,
+            specialNeeds,
+            vaccinated,
+            neutered
+        } = req.body;
+
         const newPet = new ForAdoption({
             ownerFirstName,
             ownerLastName,
@@ -33,7 +48,7 @@ exports.addPet = async (req, res) => {
             specialNeeds,
             vaccinated,
             neutered,
-            petImage: req.file ? `/uploads/${req.file.filename}` : null, // Save image path
+            petImage: req.file ? `/uploads/${req.file.filename}` : null,
         });
 
         await newPet.save();
@@ -43,9 +58,8 @@ exports.addPet = async (req, res) => {
     }
 };
 
-
 // Get all pets available for adoption
-exports.getAllPets = async (req, res) => {
+export const getAllPets = async (req, res) => {
     try {
         const pets = await ForAdoption.find();
         res.status(200).json(pets);
@@ -55,7 +69,7 @@ exports.getAllPets = async (req, res) => {
 };
 
 // Get a single pet by ID
-exports.getPetById = async (req, res) => {
+export const getPetById = async (req, res) => {
     try {
         const pet = await ForAdoption.findById(req.params.id);
         if (!pet) return res.status(404).json({ message: "Pet not found" });
@@ -66,7 +80,7 @@ exports.getPetById = async (req, res) => {
 };
 
 // Update pet details
-exports.updatePet = async (req, res) => {
+export const updatePet = async (req, res) => {
     try {
         const updatedPet = await ForAdoption.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedPet) return res.status(404).json({ message: "Pet not found" });
@@ -77,7 +91,7 @@ exports.updatePet = async (req, res) => {
 };
 
 // Delete a pet
-exports.deletePet = async (req, res) => {
+export const deletePet = async (req, res) => {
     try {
         const deletedPet = await ForAdoption.findByIdAndDelete(req.params.id);
         if (!deletedPet) return res.status(404).json({ message: "Pet not found" });

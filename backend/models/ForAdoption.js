@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const ForAdoptionSchema = new mongoose.Schema({
     ownerFirstName: { type: String, required: true },
@@ -18,4 +18,5 @@ const ForAdoptionSchema = new mongoose.Schema({
     petImage: { type: String }, // Image path
 }, { timestamps: true });
 
-module.exports = mongoose.model("ForAdoption", ForAdoptionSchema);
+const ForAdoption = mongoose.model("ForAdoption", ForAdoptionSchema);
+export default ForAdoption;

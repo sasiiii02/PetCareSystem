@@ -1,12 +1,19 @@
-const express = require('express');
+import express from 'express';
+import {
+  createApplication,
+  getUserApplications,
+  updateApplication,
+  deleteApplication,
+  getAllApplications
+} from '../controllers/adoptionFormControllers.js';
+import authMiddleware from "../middleware/authMiddleware.js";
+
 const router = express.Router();
-const adoptionFormControllers = require('../controllers/adoptionFormControllers');
-const authMiddleware = require("../middleware/authMiddleware"); // Import middleware
 
-router.post('/apply', adoptionFormControllers.createApplication);
-router.get('/my-applications', authMiddleware, adoptionFormControllers.getUserApplications); // Add middleware
-router.put('/update/:id', adoptionFormControllers.updateApplication);
-router.delete('/delete/:id', adoptionFormControllers.deleteApplication);
-router.get('/all', adoptionFormControllers.getAllApplications);
+router.post('/apply', createApplication);
+router.get('/my-applications', authMiddleware, getUserApplications);
+router.put('/update/:id', updateApplication);
+router.delete('/delete/:id', deleteApplication);
+router.get('/all', getAllApplications);
 
-module.exports = router;
+export default router;

@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import AdoptablePet from '../models/AdoptablePet.js';
+
 const router = express.Router();
-const AdoptablePet = require('../models/AdoptablePet');
 
 // POST endpoint to add a pet to adoptable pets collection
 router.post('/api/adoptablepets', async (req, res) => {
@@ -14,4 +15,4 @@ router.post('/api/adoptablepets', async (req, res) => {
   }
 });
 
-module.exports = router; 
+export default router;
