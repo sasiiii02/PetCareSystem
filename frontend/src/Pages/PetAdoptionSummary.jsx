@@ -2,46 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { Heart, Edit, Trash2, Save, X, CheckCircle, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 
-// Example pet data for demonstration
-const examplePetData = {
-  id: "demo123",
-  petName: "Buddy",
-  petAge: "3 years",
-  petSpecies: "Dog",
-  petBreed: "Golden Retriever",
-  petGender: "Male",
-  vaccinated: true,
-  neutered: true,
-  specialNeeds: false,
-  petDescription: "Buddy is a friendly, energetic Golden Retriever who loves to play fetch and go on long walks. He's great with children and other pets. Buddy is house-trained and knows basic commands like sit, stay, and come.",
-  reason: "Moving to an apartment that doesn't allow pets.",
-  ownerFirstName: "John",
-  ownerLastName: "Smith",
-  email: "john.smith@example.com",
-  phone: "(555) 123-4567",
-  petImageUrl: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Z29sZGVuJTIwcmV0cmlldmVyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
-};
-
-const PetAdoptionSummary = ({ petData = examplePetData, onUpdate, onDelete }) => {
+const PetAdoptionSummary = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState(petData || {});
+  const [formData, setFormData] = useState(null);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null); // 'success', 'error', or null
-  const [previewImage, setPreviewImage] = useState(
-    petData?.petImageUrl || null
-  );
+  const [previewImage, setPreviewImage] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const petSpeciesOptions = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Other'];
   const petGenderOptions = ['Male', 'Female'];
 
+  // Fetch pet data from MongoDB
   useEffect(() => {
-    if (petData) {
-      setFormData(petData);
-      if (petData.petImageUrl) {
-        setPreviewImage(petData.petImageUrl);
+    const fetchPetData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/foradoption');
+        if (response.data && response.data.length > 0) {
+          setFormData(response.data[0]); // Get the first pet for now
+          setPreviewImage(response.data[0].petImage ? 
+            `http://localhost:5000${response.data[0].petImage}` : null);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching pet data:', error);
+        setStatus('error');
+        setLoading(false);
       }
-    }
-  }, [petData]);
+    };
+
+    fetchPetData();
+  }, []);
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -56,10 +47,11 @@ const PetAdoptionSummary = ({ petData = examplePetData, onUpdate, onDelete }) =>
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData({
-        ...formData,
-        petImage: file,
-      });
+      // Update formData with the new file
+      setFormData(prev => ({
+        ...prev,
+        petImage: file
+      }));
       
       // Create preview URL
       const reader = new FileReader();
@@ -74,7 +66,6 @@ const PetAdoptionSummary = ({ petData = examplePetData, onUpdate, onDelete }) =>
   const validateForm = () => {
     const newErrors = {};
     
-    // Only validate fields that are required
     if (!formData.petName?.trim()) newErrors.petName = 'Pet name is required';
     if (!formData.petAge?.trim()) newErrors.petAge = 'Pet age is required';
     if (!formData.petBreed?.trim()) newErrors.petBreed = 'Pet breed is required';
@@ -84,16 +75,43 @@ const PetAdoptionSummary = ({ petData = examplePetData, onUpdate, onDelete }) =>
     return Object.keys(newErrors).length === 0;
   };
 
-  // Mock API call for the demo
+  // Handle form submission
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
-        // Simulate API call delay
+        const data = new FormData();
+        
+        // Append all form data except the image
+        Object.keys(formData).forEach(key => {
+          if (key !== 'petImage') {
+            data.append(key, formData[key]);
+          }
+        });
+        
+        // Append the image file if it's a new file
+        if (formData.petImage instanceof File) {
+          data.append('petImage', formData.petImage);
+        }
+
+        const response = await axios.put(
+          `http://localhost:5000/api/foradoption/${formData._id}`,
+          data,
+          {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          }
+        );
+
+        // Update the form data with the response
+        setFormData(response.data);
+        // Update the preview image with the new image path
+        if (response.data.petImage) {
+          setPreviewImage(`http://localhost:5000${response.data.petImage}`);
+        }
+        
         setStatus('success');
         setTimeout(() => {
           setStatus(null);
           setIsEditing(false);
-          if (onUpdate) onUpdate(formData);
         }, 2000);
       } catch (error) {
         console.error("Error updating pet adoption:", error);
@@ -105,19 +123,36 @@ const PetAdoptionSummary = ({ petData = examplePetData, onUpdate, onDelete }) =>
     }
   };
 
-  // Mock deletion for the demo
+  // Handle deletion
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this adoption listing? This action cannot be undone.")) {
       try {
-        // Simulate API call
-        if (onDelete) onDelete(formData.id);
-        alert("Listing deleted successfully! (This is a demo)")
+        await axios.delete(`http://localhost:5000/api/foradoption/${formData._id}`);
+        alert("Listing deleted successfully!");
+        // Redirect to home or another appropriate page
+        window.location.href = '/'; // or use navigate('/') if you're using react-router
       } catch (error) {
         console.error("Error deleting pet adoption:", error);
         alert("Failed to delete the adoption listing. Please try again.");
       }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-xl text-[#B3704D]">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!formData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-xl text-[#B3704D]">No pet adoption listings found.</div>
+      </div>
+    );
+  }
 
   // Status notification component
   const StatusNotification = ({ type, message }) => (
@@ -179,8 +214,8 @@ const PetAdoptionSummary = ({ petData = examplePetData, onUpdate, onDelete }) =>
               <button
                 onClick={() => {
                   setIsEditing(false);
-                  setFormData(petData);
-                  setPreviewImage(petData?.petImageUrl || null);
+                  setFormData(null);
+                  setPreviewImage(null);
                 }}
                 className="bg-white text-gray-700 px-4 py-2 rounded-lg flex items-center hover:bg-gray-100 transition"
               >

@@ -14,7 +14,8 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  Trash2
+  Trash2,
+  CheckCircle
 } from 'lucide-react';
 
 const PetAdoptionDashboard = () => {
@@ -36,6 +37,8 @@ const PetAdoptionDashboard = () => {
     specialNeeds: false,
     status: 'Available'
   });
+  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState({ show: false, petId: null, petName: '' });
   const navigate = useNavigate();
 
   // Fetch pets data from MongoDB
@@ -155,28 +158,45 @@ const PetAdoptionDashboard = () => {
 
   // Handle delete pet
   const handleDeletePet = async (petId) => {
-    if (window.confirm("Are you sure you want to remove this pet from the adoptable list?")) {
-      try {
-        setDeleteLoading(true);
-        await axios.delete(`http://localhost:5000/api/adoptablepets/${petId}`);
-        // Refresh pet list after successful deletion
-        fetchPets();
-      } catch (err) {
-        console.error("Error deleting pet:", err);
-        alert("Failed to delete pet. Please try again.");
-      } finally {
-        setDeleteLoading(false);
-      }
+    try {
+      setDeleteLoading(true);
+      await axios.delete(`http://localhost:5000/api/adoptablepets/${petId}`);
+      fetchPets();
+      setNotification({
+        show: true,
+        message: 'Pet removed successfully! 🗑️',
+        type: 'success'
+      });
+      setShowDeleteConfirm({ show: false, petId: null, petName: '' });
+    } catch (err) {
+      console.error("Error deleting pet:", err);
+      setNotification({
+        show: true,
+        message: 'Failed to remove pet ❌',
+        type: 'error'
+      });
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
   const handleCopyPet = async (petId) => {
     try {
       const response = await axios.post(`http://localhost:5000/api/movePet/${petId}`);
-      alert(response.data.message); // "Pet moved successfully!"
+      setNotification({
+        show: true,
+        message: 'Pet added successfully! 🐾',
+        type: 'success'
+      });
+      setTimeout(() => setNotification({ show: false, message: '', type: '' }), 2500);
     } catch (err) {
       console.error(err);
-      alert("Failed to copy pet data");
+      setNotification({
+        show: true,
+        message: 'Failed to add pet ❌',
+        type: 'error'
+      });
+      setTimeout(() => setNotification({ show: false, message: '', type: '' }), 2500);
     }
   };
 
@@ -320,9 +340,16 @@ const PetAdoptionDashboard = () => {
   const renderPetList = () => (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-extrabold text-gray-800 flex items-center">
-          <Dog className="mr-3 text-gray-600" /> Adoptable Pets
-        </h2>
+        <div className="flex items-center">
+          <h2 className="text-3xl font-extrabold text-gray-800 flex items-center">
+            <Dog className="mr-3 text-gray-600" /> Adoptable Pets
+          </h2>
+          <div className="ml-4 bg-gray-800/80 backdrop-blur-sm px-4 py-2 rounded-full">
+            <span className="text-white font-semibold">
+              Total Pets: {pets.length}
+            </span>
+          </div>
+        </div>
         <div className="flex space-x-3">
           <button 
             className="flex items-center bg-gradient-to-r from-gray-500 to-gray-700 text-white px-5 py-2 rounded-full shadow-lg hover:scale-105 transition-transform"
@@ -406,19 +433,25 @@ const PetAdoptionDashboard = () => {
 
                   {/* Buttons */}
                   <div className="mt-4 flex space-x-2">
-                  <button 
-                  className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition"
-                  onClick={() => handleCopyPet(pet._id)}
-                >
-                  copy data another table
-                </button>
+                    <button 
+                      className="flex-1 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition flex items-center justify-center"
+                      onClick={() => handleCopyPet(pet._id)}
+                    >
+                      <PlusCircle className="mr-2" size={18} />
+                      Add Pet
+                    </button>
 
                     <button 
-                      className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition"
-                      onClick={() => handleDeletePet(pet._id)}
+                      className="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
+                      onClick={() => setShowDeleteConfirm({ 
+                        show: true, 
+                        petId: pet._id, 
+                        petName: pet.petName 
+                      })}
                       disabled={deleteLoading}
                     >
-                      <Trash2 size={18} />
+                      <Trash2 className="mr-2" size={18} />
+                      Remove Pet
                     </button>
                   </div>
                 </div>
@@ -541,6 +574,75 @@ const PetAdoptionDashboard = () => {
     </div>
   );
 
+  const Notification = ({ message, type }) => (
+    <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+      <div className={`
+        animate-fade-in
+        px-8 py-4 rounded-xl shadow-2xl 
+        flex items-center gap-3
+        backdrop-blur-sm
+        ${type === 'success' 
+          ? 'bg-green-500/90 text-white ring-2 ring-green-400' 
+          : 'bg-red-500/90 text-white ring-2 ring-red-400'}
+        transform transition-all duration-300 ease-out
+        min-w-[300px] justify-center
+      `}>
+        {type === 'success' ? (
+          <CheckCircle className="h-6 w-6 flex-shrink-0" />
+        ) : (
+          <XCircle className="h-6 w-6 flex-shrink-0" />
+        )}
+        <span className="font-semibold text-lg text-center">{message}</span>
+      </div>
+    </div>
+  );
+
+  // Add this new component for the delete confirmation modal
+  const DeleteConfirmationModal = ({ petName, onConfirm, onCancel }) => (
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel}></div>
+      <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 z-50 transform transition-all">
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-full bg-red-100 mx-auto mb-4 flex items-center justify-center">
+            <Trash2 className="h-6 w-6 text-red-600" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Confirm Removal</h3>
+          <p className="text-gray-600 mb-6">
+            Are you sure you want to remove <span className="font-semibold text-gray-800">{petName}</span> from the adoptable list?
+          </p>
+          <div className="flex space-x-3 justify-center">
+            <button
+              onClick={onCancel}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Remove Pet
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Add this CSS animation at the top of your file after the imports
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fade-in {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .animate-fade-in {
+      animation: fade-in 0.3s ease-out forwards;
+    }
+  `;
+  document.head.appendChild(style);
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -599,6 +701,20 @@ const PetAdoptionDashboard = () => {
 
       {/* Add Pet Modal */}
       {renderAddPetModal()}
+      
+      {/* Notification */}
+      {notification.show && (
+        <Notification message={notification.message} type={notification.type} />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm.show && (
+        <DeleteConfirmationModal
+          petName={showDeleteConfirm.petName}
+          onConfirm={() => handleDeletePet(showDeleteConfirm.petId)}
+          onCancel={() => setShowDeleteConfirm({ show: false, petId: null, petName: '' })}
+        />
+      )}
     </div>
   );
 };

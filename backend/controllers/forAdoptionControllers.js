@@ -1,6 +1,13 @@
 import ForAdoption from "../models/ForAdoption.js";
 import multer from "multer";
 import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import fs from 'fs';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Configure multer for image upload
 const storage = multer.diskStorage({
@@ -58,45 +65,121 @@ export const addPet = async (req, res) => {
     }
 };
 
-// Get all pets available for adoption
-export const getAllPets = async (req, res) => {
+// Get all adoption listings
+export const getAllAdoptionListings = async (req, res) => {
     try {
-        const pets = await ForAdoption.find();
-        res.status(200).json(pets);
+      const listings = await ForAdoption.find().sort({ createdAt: -1 });
+      res.status(200).json(listings);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      console.error('Error fetching adoption listings:', error);
+      res.status(500).json({ message: 'Failed to fetch adoption listings', error: error.message });
     }
-};
-
-// Get a single pet by ID
-export const getPetById = async (req, res) => {
+  };
+  
+  // Get specific adoption listing by ID
+  export const getAdoptionListingById = async (req, res) => {
     try {
-        const pet = await ForAdoption.findById(req.params.id);
-        if (!pet) return res.status(404).json({ message: "Pet not found" });
-        res.status(200).json(pet);
+      const listing = await ForAdoption.findById(req.params.id);
+      
+      if (!listing) {
+        return res.status(404).json({ message: 'Adoption listing not found' });
+      }
+      
+      res.status(200).json(listing);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      console.error('Error fetching adoption listing:', error);
+      res.status(500).json({ message: 'Failed to fetch adoption listing', error: error.message });
     }
-};
-
-// Update pet details
-export const updatePet = async (req, res) => {
+  };
+  
+  // Get adoption listings by owner's email
+  export const getAdoptionListingsByOwner = async (req, res) => {
     try {
-        const updatedPet = await ForAdoption.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!updatedPet) return res.status(404).json({ message: "Pet not found" });
-        res.status(200).json({ message: "Pet updated successfully", updatedPet });
+      const { email } = req.params;
+      const listings = await ForAdoption.find({ email }).sort({ createdAt: -1 });
+      
+      res.status(200).json(listings);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      console.error('Error fetching owner\'s adoption listings:', error);
+      res.status(500).json({ message: 'Failed to fetch owner\'s adoption listings', error: error.message });
     }
-};
-
-// Delete a pet
-export const deletePet = async (req, res) => {
+  };
+  
+  // Update adoption listing
+  export const updateAdoptionListing = async (req, res) => {
     try {
-        const deletedPet = await ForAdoption.findByIdAndDelete(req.params.id);
-        if (!deletedPet) return res.status(404).json({ message: "Pet not found" });
-        res.status(200).json({ message: "Pet deleted successfully" });
+      const listingId = req.params.id;
+      const listing = await ForAdoption.findById(listingId);
+      
+      if (!listing) {
+        return res.status(404).json({ message: 'Adoption listing not found' });
+      }
+      
+      // Convert string boolean values to actual booleans
+      const updatedData = { ...req.body };
+      ['specialNeeds', 'vaccinated', 'neutered'].forEach(field => {
+        if (field in updatedData) {
+          updatedData[field] = updatedData[field] === 'true';
+        }
+      });
+      
+      // Handle image upload if a new image is provided
+      if (req.file) {
+        // Delete old image if it exists
+        if (listing.petImage) {
+          const oldImagePath = path.join(__dirname, '..', listing.petImage);
+          try {
+            if (fs.existsSync(oldImagePath)) {
+              fs.unlinkSync(oldImagePath);
+            }
+          } catch (err) {
+            console.error('Error deleting old image:', err);
+          }
+        }
+        // Update with new image path (fix the path)
+        updatedData.petImage = `/uploads/${req.file.filename}`;
+      }
+      
+      const updatedListing = await ForAdoption.findByIdAndUpdate(
+        listingId,
+        { $set: updatedData },
+        { new: true }
+      );
+      
+      res.status(200).json(updatedListing);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      console.error('Error updating adoption listing:', error);
+      res.status(500).json({ message: 'Failed to update adoption listing', error: error.message });
     }
-};
+  };
+  
+  // Delete adoption listing
+  export const deleteAdoptionListing = async (req, res) => {
+    try {
+      const listingId = req.params.id;
+      const listing = await ForAdoption.findById(listingId);
+      
+      if (!listing) {
+        return res.status(404).json({ message: 'Adoption listing not found' });
+      }
+      
+      // Delete associated image if it exists
+      if (listing.petImage) {
+        const imagePath = path.join(__dirname, '..', listing.petImage);
+        try {
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+          }
+        } catch (err) {
+          console.error('Error deleting image file:', err);
+          // Continue with deletion even if image deletion fails
+        }
+      }
+      
+      await ForAdoption.findByIdAndDelete(listingId);
+      res.status(200).json({ message: 'Adoption listing deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting adoption listing:', error);
+      res.status(500).json({ message: 'Failed to delete adoption listing', error: error.message });
+    }
+  };
