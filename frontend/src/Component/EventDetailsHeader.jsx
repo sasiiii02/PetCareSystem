@@ -1,8 +1,19 @@
 import React from 'react';
+import { FaCalendar, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
 
 const EventDetailsHeader = ({ event }) => {
+  // Theme settings - matching PetServices
+  const theme = {
+    primary: "bg-[#D08860]",
+    secondary: "bg-[#B3714E]",
+    textPrimary: "text-white",
+    textSecondary: "text-amber-950",
+    accent: "bg-amber-100",
+    border: "border-amber-200",
+  };
+
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-lg">
+    <div className="rounded-xl overflow-hidden shadow-lg bg-white">
       <div className="relative">
         <img 
           src={event.image} 
@@ -15,33 +26,28 @@ const EventDetailsHeader = ({ event }) => {
       </div>
       
       <div className="p-6">
-        <div className="flex items-center space-x-6 mb-4">
-          <div className="flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#D08860]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+        <div className="flex flex-wrap items-center gap-6 mb-4">
+          <div className="flex items-center">
+            <FaCalendar className="text-[#D08860] mr-2" />
             <span className="text-lg font-semibold text-gray-700">{event.date}</span>
           </div>
           
-          <div className="flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#D08860]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div className="flex items-center">
+            <FaClock className="text-[#D08860] mr-2" />
             <span className="text-lg font-semibold text-gray-700">{event.time}</span>
           </div>
         </div>
         
-        <div className="flex items-center space-x-2 mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#D08860]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+        <div className="flex items-center mb-4">
+          <FaMapMarkerAlt className="text-[#D08860] mr-2" />
           <p className="text-lg text-gray-700 font-medium">{event.location}</p>
         </div>
         
-        <p className="text-gray-800 text-base leading-relaxed bg-gray-50 p-4 rounded-lg border-l-4 border-[#D08860]">
-          {event.description}
-        </p>
+        <div className={`${theme.accent} rounded-lg p-4 border-l-4 border-[#D08860]`}>
+          <p className="text-amber-800 text-base leading-relaxed">
+            {event.description}
+          </p>
+        </div>
       </div>
     </div>
   );

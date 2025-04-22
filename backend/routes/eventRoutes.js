@@ -4,25 +4,24 @@ import {
   getAllEvents,
   deleteEvent,
   updateEvent,
-  getEventById 
+  getEventById // Import the function to get event by ID
 } from "../controllers/eventController.js";
-import adminAuth from "../middleware/adminAuthMiddleware.js"; // Import authentication middleware
 
 const router = express.Router();
 
-// Route to create a new event (only admins can create)
-router.post("/create", adminAuth, createEvent);
+// Route to create a new event
+router.post("/create", createEvent);
 
-// Route to get all events (open to all users)
+// Route to get all events
 router.get("/", getAllEvents);
 
-// Route to get a single event by ID (open to all users)
+// Route to get a single event by ID
 router.get("/:eventId", getEventById); 
 
-// Route to update an event by ID (only admins can update)
-router.put("/:eventId", adminAuth, updateEvent);
+// Route to update an event by ID
+router.put('/:eventId', updateEvent);
 
-// Route to delete an event by ID (only admins can delete)
-router.delete("/:eventId", adminAuth, deleteEvent);
+// Route to delete an event by ID
+router.delete("/:eventId", deleteEvent);
 
 export default router;

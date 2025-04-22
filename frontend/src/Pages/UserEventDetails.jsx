@@ -105,7 +105,7 @@ const UserEventDetailsPage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto mt-28 p-6 bg-white shadow-md rounded-lg relative">
+    <div className="bg-amber-50 max-w-4xl mx-auto mt-28 p-6 shadow-md rounded-lg relative">
       <EventDetailsHeader event={event} />
 
       <div className="mt-6 flex flex-col items-center">

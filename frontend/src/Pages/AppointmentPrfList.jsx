@@ -4,7 +4,7 @@ import AppointmentForm from '../Component/AppointmentForm';
 
 function AppointmentPrfList() {
   return (
-    <div>
+    <div className='bg-amber-50'>
       <PetServices />
 
     </div>

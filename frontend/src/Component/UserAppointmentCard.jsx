@@ -194,39 +194,39 @@ function ProfessionalCard({ id, imgSrc, name, title, description, fee, onBook, t
 // Sample Data with 6 Professionals in Each Category
 const professionals = {
   veterinarian: [
-    { id: "VET001", imgSrc: "vet1.jpg", name: "Dr. John Smith", title: "Veterinary Surgeon", description: "Expert in small animal surgery and emergency care.", fee: 50 },
-    { id: "VET002", imgSrc: "vet2.jpg", name: "Dr. Sarah Johnson", title: "Animal Behavior Specialist", description: "Focuses on pet behavioral issues and preventive care.", fee: 45 },
-    { id: "VET003", imgSrc: "vet3.jpg", name: "Dr. Emily Brown", title: "Exotic Pet Specialist", description: "Specialist in birds, reptiles, and exotic mammals.", fee: 60 },
-    { id: "VET004", imgSrc: "vet4.jpg", name: "Dr. Michael Chen", title: "Feline Specialist", description: "Expert in cat health and behavior with 15 years of experience.", fee: 55 },
-    { id: "VET005", imgSrc: "vet5.jpg", name: "Dr. Lisa Rodriguez", title: "Emergency Care Veterinarian", description: "Available 24/7 for urgent pet medical needs.", fee: 70 },
-    { id: "VET006", imgSrc: "vet6.jpg", name: "Dr. David Kim", title: "Orthopedic Specialist", description: "Specializes in bone fractures and joint surgeries.", fee: 80 },
-    { id: "VET007", imgSrc: "vet7.jpg", name: "Dr. Sophia Patel", title: "Dermatology Veterinarian", description: "Treats skin allergies and infections in pets.", fee: 60 },
-    { id: "VET008", imgSrc: "vet8.jpg", name: "Dr. Robert Taylor", title: "Senior Pet Care Specialist", description: "Focuses on geriatric pet health and pain management.", fee: 65 },
-    { id: "VET009", imgSrc: "vet9.jpg", name: "Dr. Olivia Wong", title: "Nutrition Specialist", description: "Creates customized diet plans for pets with health conditions.", fee: 50 },
-    { id: "VET010", imgSrc: "vet10.jpg", name: "Dr. James Wilson", title: "Avian Veterinarian", description: "Specializes in bird health and wellness.", fee: 75 }
+    { id: "VET001", imgSrc: "/vet1.jpg", name: "Dr. Sarah Johnson", title: "Veterinary Surgeon", description: "Specializes in small animal surgery with 10 years of experience.", fee: 65 },
+    { id: "VET002", imgSrc: "/vet2.jpg", name: "Dr. Michael Chen", title: "Feline Specialist", description: "Expert in cat health and behavior with 15 years of experience.", fee: 70 },
+    { id: "VET003", imgSrc: "/vet3.jpg", name: "Dr. Emily Wilson", title: "Emergency Care", description: "Available 24/7 for urgent pet medical needs.", fee: 85 },
+    { id: "VET004", imgSrc: "/vet4.jpg", name: "Dr. David Kim", title: "Orthopedic Specialist", description: "Specializes in bone fractures and joint surgeries.", fee: 90 },
+    { id: "VET005", imgSrc: "/vet5.jpg", name: "Dr. Olivia Martinez", title: "Dermatology", description: "Treats skin allergies and infections in pets.", fee: 75 },
+    { id: "VET006", imgSrc: "/vet6.jpg", name: "Dr. Robert Taylor", title: "Senior Pet Care", description: "Focuses on geriatric pet health and pain management.", fee: 70 },
+    { id: "VET007", imgSrc: "/vet7.jpg", name: "Dr. Sophia Patel", title: "Exotic Animals", description: "Specialist in birds, reptiles, and exotic mammals.", fee: 80 },
+    { id: "VET008", imgSrc: "/vet8.jpg", name: "Dr. James Wilson", title: "Nutrition Specialist", description: "Creates customized diet plans for pets with health conditions.", fee: 65 },
+    { id: "VET009", imgSrc: "/vet9.jpg", name: "Dr. Lisa Rodriguez", title: "Behavioral Specialist", description: "Helps with anxiety, aggression, and other behavioral issues.", fee: 75 },
+    { id: "VET010", imgSrc: "/vet10.jpg", name: "Dr. John Smith", title: "General Practice", description: "Comprehensive care for all your pet's health needs.", fee: 60 }
   ],
   groomer: [
-    { id: "GROOM001", imgSrc: "groomer1.jpg", name: "Emily Davis", title: "Professional Groomer", description: "Expert in stylish pet grooming.", fee: 40 },
-    { id: "GROOM002", imgSrc: "groomer2.jpg", name: "James Wilson", title: "Luxury Pet Stylist", description: "Provides high-end grooming for show pets.", fee: 55 },
-    { id: "GROOM003", imgSrc: "groomer3.jpg", name: "Sophia Martinez", title: "Mobile Groomer", description: "Comes to your home for stress-free grooming.", fee: 60 },
-    { id: "GROOM004", imgSrc: "groomer4.jpg", name: "David Thompson", title: "Breed-Specific Specialist", description: "Expert in breed-standard cuts for all dog types.", fee: 50 },
-    { id: "GROOM005", imgSrc: "groomer5.jpg", name: "Emma Johnson", title: "Puppy Grooming Expert", description: "Special gentle approach for puppies' first grooming.", fee: 45 },
-    { id: "GROOM006", imgSrc: "groomer6.jpg", name: "Michael Brown", title: "Cat Grooming Specialist", description: "Patient and experienced with feline clients.", fee: 55 },
-    { id: "GROOM007", imgSrc: "groomer7.jpg", name: "Olivia Smith", title: "Therapeutic Groomer", description: "Special care for pets with anxiety or special needs.", fee: 65 },
-    { id: "GROOM008", imgSrc: "groomer8.jpg", name: "Daniel Lee", title: "Creative Stylist", description: "Expert in creative coloring and fun pet styles.", fee: 75 },
-    { id: "GROOM009", imgSrc: "groomer9.jpg", name: "Ava Garcia", title: "Senior Pet Groomer", description: "Gentle grooming for older pets with mobility issues.", fee: 50 },
-    { id: "GROOM010", imgSrc: "groomer10.jpg", name: "William Clark", title: "Deshedding Specialist", description: "Reduces shedding with specialized techniques.", fee: 60 }
+    { id: "GROOM001", imgSrc: "/groomer1.jpg", name: "Emma Johnson", title: "Professional Groomer", description: "Expert in stylish pet grooming with gentle handling.", fee: 45 },
+    { id: "GROOM002", imgSrc: "/groomer2.jpg", name: "James Wilson", title: "Luxury Stylist", description: "Provides high-end grooming for show pets.", fee: 65 },
+    { id: "GROOM003", imgSrc: "/groomer3.jpg", name: "Sophia Davis", title: "Mobile Groomer", description: "Comes to your home for stress-free grooming.", fee: 70 },
+    { id: "GROOM004", imgSrc: "/groomer4.jpg", name: "David Thompson", title: "Breed Specialist", description: "Expert in breed-standard cuts for all dog types.", fee: 55 },
+    { id: "GROOM005", imgSrc: "/groomer5.jpg", name: "Olivia Smith", title: "Puppy Specialist", description: "Special gentle approach for puppies' first grooming.", fee: 50 },
+    { id: "GROOM006", imgSrc: "/groomer6.jpg", name: "Michael Brown", title: "Cat Groomer", description: "Patient and experienced with feline clients.", fee: 60 },
+    { id: "GROOM007", imgSrc: "/groomer7.jpg", name: "Ava Garcia", title: "Therapeutic Groomer", description: "Special care for pets with anxiety or special needs.", fee: 65 },
+    { id: "GROOM008", imgSrc: "/groomer8.jpg", name: "Daniel Lee", title: "Creative Stylist", description: "Expert in creative coloring and fun pet styles.", fee: 80 },
+    { id: "GROOM009", imgSrc: "/groomer9.jpg", name: "William Clark", title: "Senior Pet Groomer", description: "Gentle grooming for older pets with mobility issues.", fee: 55 },
+    { id: "GROOM010", imgSrc: "/groomer10.jpg", name: "Rachel Kim", title: "Deshedding Expert", description: "Reduces shedding with specialized techniques.", fee: 65 }
   ],
   trainer: [
-    { id: "TRAIN001", imgSrc: "trainer1.jpg", name: "Mike Reynolds", title: "Certified Pet Trainer", description: "Teaches obedience and behavior training.", fee: 50 },
-    { id: "TRAIN002", imgSrc: "trainer2.jpg", name: "Jessica Adams", title: "Agility Training Specialist", description: "Prepares pets for competitions and obstacle courses.", fee: 65 },
-    { id: "TRAIN003", imgSrc: "trainer3.jpg", name: "Christopher Lee", title: "Service Dog Trainer", description: "Trains assistance dogs for people with disabilities.", fee: 80 },
-    { id: "TRAIN004", imgSrc: "trainer4.jpg", name: "Amanda Wilson", title: "Puppy Socialization Expert", description: "Helps puppies develop good manners and confidence.", fee: 45 },
-    { id: "TRAIN005", imgSrc: "trainer5.jpg", name: "Ryan Park", title: "Therapy Dog Trainer", description: "Prepares dogs for hospital and nursing home visits.", fee: 70 },
-    { id: "TRAIN006", imgSrc: "trainer6.jpg", name: "Nicole Garcia", title: "Behavior Modification Specialist", description: "Works with aggressive or fearful dogs.", fee: 75 },
-    { id: "TRAIN007", imgSrc: "trainer7.jpg", name: "Kevin Brown", title: "Trick Training Expert", description: "Teaches fun tricks and advanced commands.", fee: 55 },
-    { id: "TRAIN008", imgSrc: "trainer8.jpg", name: "Rachel Kim", title: "Off-Leash Training Specialist", description: "Trains reliable recall and off-leash control.", fee: 65 },
-    { id: "TRAIN009", imgSrc: "trainer9.jpg", name: "Jason Miller", title: "Protection Dog Trainer", description: "Trains personal protection dogs (for qualified homes).", fee: 90 },
-    { id: "TRAIN010", imgSrc: "trainer10.jpg", name: "Lauren Taylor", title: "Canine Fitness Trainer", description: "Improves strength and mobility through exercises.", fee: 60 }
+    { id: "TRAIN001", imgSrc: "/trainer1.jpg", name: "Mike Reynolds", title: "Obedience Trainer", description: "Teaches basic commands and good manners.", fee: 50 },
+    { id: "TRAIN002", imgSrc: "/trainer2.jpg", name: "Jessica Adams", title: "Agility Trainer", description: "Prepares pets for competitions and obstacle courses.", fee: 70 },
+    { id: "TRAIN003", imgSrc: "/trainer3.jpg", name: "Christopher Lee", title: "Service Dog Trainer", description: "Trains assistance dogs for people with disabilities.", fee: 90 },
+    { id: "TRAIN004", imgSrc: "/trainer4.jpg", name: "Amanda Wilson", title: "Puppy Trainer", description: "Helps puppies develop good manners and confidence.", fee: 55 },
+    { id: "TRAIN005", imgSrc: "/trainer5.jpg", name: "Ryan Park", title: "Therapy Dog Trainer", description: "Prepares dogs for hospital and nursing home visits.", fee: 75 },
+    { id: "TRAIN006", imgSrc: "/trainer6.jpg", name: "Nicole Garcia", title: "Behavior Specialist", description: "Works with aggressive or fearful dogs.", fee: 80 },
+    { id: "TRAIN007", imgSrc: "/trainer7.jpg", name: "Kevin Brown", title: "Trick Trainer", description: "Teaches fun tricks and advanced commands.", fee: 60 },
+    { id: "TRAIN008", imgSrc: "/trainer8.jpg", name: "Rachel Kim", title: "Off-Leash Expert", description: "Trains reliable recall and off-leash control.", fee: 70 },
+    { id: "TRAIN009", imgSrc: "/trainer9.jpg", name: "Jason Miller", title: "Protection Trainer", description: "Trains personal protection dogs (qualified homes only).", fee: 95 },
+    { id: "TRAIN010", imgSrc: "/trainer10.jpg", name: "Lauren Taylor", title: "Canine Fitness", description: "Improves strength and mobility through exercises.", fee: 65 }
   ]
 };

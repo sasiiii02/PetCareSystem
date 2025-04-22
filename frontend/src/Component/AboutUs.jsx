@@ -119,31 +119,31 @@ export default function AboutUs() {
                 name: "Dr. Ishara Perera",
                 role: "Lead Veterinarian",
                 bio: "With 12 years of experience, Dr. Perera ensures all pets receive exceptional medical care.",
-                image: "/logo.jpg"
+                image: "/vet1.jpg"
               },
               {
                 name: "Tharaka Fernando",
                 role: "Adoption Specialist",
                 bio: "NihTharakal has matched over 300 pets with loving families across Sri Lanka.",
-                image: "/logo.jpg"
+                image: "/train.jpg"
               },
               {
                 name: "Dasun Bandara",
                 role: "Pet Behaviorist",
                 bio: "Dasun's training methods help pets adjust seamlessly to their new families.",
-                image: "/logo.jpg"
+                image: "/trainer1.jpg"
               },
               {
                 name: "Tharindu Rajapakse",
                 role: "Store Manager",
                 bio: "Tharindu curates our pet store with the finest selection of products for every pet.",
-                image: "/logo.jpg"
+                image: "/adop.jpg"
               },
               {
                 name: "Sasi Karunarathna",
                 role: "Events Coordinator",
                 bio: "Sasi organizes engaging pet community events throughout Sri Lanka.",
-                image: "/logo.jpg"
+                image: "/eventsasi.jpg"
               }
             ].map((member, index) => (
               <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
