@@ -8,7 +8,7 @@ import HeroSection from "../components/HeroSection"; // Import the new IntroSect
 
 const Dashboard = () => {
   return (
-    <div className="bg-[#F5EFEA] min-h-screen">
+    <div className=" min-h-screen">
       {/* Use the reusable IntroSection component */}
       <HeroSection
         title="Transform Your Ideas into Reality"

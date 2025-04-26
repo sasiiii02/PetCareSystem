@@ -10,23 +10,21 @@ import EditEvent from './pages/EditEvent';
 import Notification from './pages/Notification';
 
 
-
 function App() {
   return (
     <BrowserRouter>
-    <Header />
-    <Routes>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/create-event" element={<CreateEvent />} />
-      <Route path="/my-events" element={<MyEvents />} />
-      <Route path="/event/:id" element={<EventDetails />} />
-      <Route path="/edit-event/:id" element={<EditEvent />} />
-      <Route path="/notifications" element={<Notification />} />
-
-
-    </Routes>
-   
-  </BrowserRouter>
+      <Header />
+      <div className="pl-64 pt-4"> {/* Add padding to offset sidebar */}
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/create-event" element={<CreateEvent />} />
+          <Route path="/my-events" element={<MyEvents />} />
+          <Route path="/event/:id" element={<EventDetails />} />
+          <Route path="/edit-event/:id" element={<EditEvent />} />
+          <Route path="/notifications" element={<Notification />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 

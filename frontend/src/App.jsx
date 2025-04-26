@@ -15,7 +15,7 @@ import Cancel from "./Pages/Cancel";
 import AppointmentPrfList from "./Pages/AppointmentPrfList";
 import AppointmentForm from "./Component/AppointmentForm";
 import ProfilePage from "./Component/UserProfileViewAppointment";
-
+import Notifications from "./Pages/Notifications";
 const App = () => {
   return (
     <BrowserRouter>
@@ -50,6 +50,14 @@ const App = () => {
             </PrivateRoute>
           }
         />
+          <Route
+    path="/notifications"
+    element={
+      <PrivateRoute>
+        <Notifications />
+      </PrivateRoute>
+    }
+  />
        
         <Route
           path="/appointment-form"

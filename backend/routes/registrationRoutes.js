@@ -1,22 +1,23 @@
 import express from "express";
-import { 
-  registerForEvent,
+import {
+  createRegistrationSession,
+  confirmRegistrationPayment,
+  getRegistrationsByEvent,
   getUserRegistrations,
-  getEventRegistrations,
-  updateRegistration,
-  deleteRegistration
+  cancelRegistration,
+  updateRegistrationTickets,
+  confirmUpdatePayment,
 } from "../controllers/registrationController.js";
 import auth from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// All registration routes require authentication
-router.use(auth);
-
-router.post("/register", registerForEvent);
-router.get("/", getUserRegistrations);
-router.get("/event/:eventId", getEventRegistrations);
-router.put("/:registrationId", updateRegistration);
-router.delete("/:registrationId", deleteRegistration);
+router.post("/:id/register", auth, createRegistrationSession);
+router.post("/confirm", auth, confirmRegistrationPayment);
+router.get("/event/:id", getRegistrationsByEvent);
+router.get("/user", auth, getUserRegistrations);
+router.patch("/:id/cancel", auth, cancelRegistration);
+router.patch("/:id/update-tickets", auth, updateRegistrationTickets);
+router.post("/confirm-update", auth, confirmUpdatePayment);
 
 export default router;

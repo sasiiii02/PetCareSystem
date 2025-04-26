@@ -1,14 +1,17 @@
 import express from "express";
-import { sendNotification, getUserNotifications } from "../controllers/notificationController.js";
-import adminAuth from "../middleware/adminAuthMiddleware.js";
-import userAuth from "../middleware/authMiddleware.js";
+import {
+  sendEventNotification,
+  getEventNotifications,
+  getUserNotifications,
+  markNotificationAsRead,
+} from "../controllers/notificationController.js";
+import auth from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Organizer sends notifications to all registered users
-router.post("/:eventId/notify", adminAuth, sendNotification);
-
-// User fetches their notifications
-router.get("/notifications", userAuth, getUserNotifications);
+router.post("/event/:id/send", sendEventNotification);
+router.get("/event/:id", getEventNotifications);
+router.get("/user", auth, getUserNotifications);
+router.patch("/:id/read", auth, markNotificationAsRead);
 
 export default router;

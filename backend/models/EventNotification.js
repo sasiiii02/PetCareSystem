@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
 
 const eventNotificationSchema = new mongoose.Schema({
-  organizerId: { 
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Admin", // Reference to event organizer (admin)
-    required: true 
-  },
   eventId: {
     type: mongoose.Schema.Types.ObjectId, 
     ref: "Event",
@@ -20,7 +15,7 @@ const eventNotificationSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
-  isRead: { 
+  read: { 
     type: Boolean, 
     default: false 
   }

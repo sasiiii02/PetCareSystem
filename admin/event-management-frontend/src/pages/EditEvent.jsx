@@ -13,39 +13,37 @@ const EditEvent = () => {
     const fetchEvent = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/events/${id}`);
-        setEvent(response.data.event); // Assuming your backend returns { event: {...} }
+        setEvent(response.data); // Backend returns event directly
       } catch (error) {
         console.error("Error fetching event:", error);
+        alert(error.response?.data?.message || "Failed to load event");
         navigate("/my-events");
       }
     };
-  
+
     fetchEvent();
   }, [id, navigate]);
 
   const handleSave = async (eventData) => {
     try {
-      // Validate required fields
-      const requiredFields = ['title', 'date', 'time', 'location', 'description', 'image'];
-      const missingFields = requiredFields.filter(field => !eventData[field]);
-  
-      if (missingFields.length > 0) {
-        throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      // Create FormData for multipart/form-data request
+      const formData = new FormData();
+      formData.append("title", eventData.title);
+      formData.append("date", eventData.date);
+      formData.append("time", eventData.time);
+      formData.append("location", eventData.location);
+      formData.append("description", eventData.description);
+      formData.append("maxAttendees", eventData.maxAttendees);
+      formData.append("price", eventData.price);
+      if (eventData.eventImage) {
+        formData.append("eventImage", eventData.eventImage);
       }
-  
-      // Prepare the payload
-      const payload = {
-        title: eventData.title,
-        date: eventData.date,
-        time: eventData.time,
-        location: eventData.location,
-        description: eventData.description,
-        eventImageURL: eventData.image
-      };
-  
-      // Make PUT request to backend
-      await axios.put(`http://localhost:5000/api/events/${id}`, payload);
-      
+
+      // Send PUT request to backend
+      await axios.put(`http://localhost:5000/api/events/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       alert("Event updated successfully!");
       navigate("/my-events");
     } catch (error) {

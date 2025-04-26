@@ -1,60 +1,108 @@
-import EventNotification from "../models/EventNotification.js";
+import mongoose from "mongoose";
 import Registration from "../models/Registration.js";
+import Event from "../models/Event.js";
+import EventNotification from "../models/EventNotification.js";
 
-// Send notification to all registered users for an event
-export const sendNotification = async (req, res) => {
+// POST /api/notifications/event/:id/send
+export const sendEventNotification = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const { eventId } = req.params; // Get event ID
-    const { content } = req.body; // Get message content
-    const organizerId = req.adminId; // Organizer sending the notification
+    const { id } = req.params;
+    const { content } = req.body;
 
-    if (!content) {
-      return res.status(400).json({ message: "Notification content is required." });
+    if (!content || typeof content !== "string" || content.trim() === "") {
+      await session.abortTransaction();
+      return res.status(400).json({ success: false, message: "Notification content is required" });
     }
 
-    // Get registered users for the event
-    const registrations = await Registration.find({ eventId }).select("userId");
-
-    if (!registrations.length) {
-      return res.status(404).json({ message: "No registered users for this event." });
+    const event = await Event.findById(id).session(session);
+    if (!event) {
+      await session.abortTransaction();
+      return res.status(404).json({ success: false, message: "Event not found" });
     }
 
-    // Create notifications for all registered users
-    const notifications = registrations.map((registration) => ({
-      organizerId,
-      eventId,
-      userId: registration.userId,
-      content,
+    const registrations = await Registration.find({ eventId: id, status: "active", paymentStatus: "paid" }).session(session);
+    if (!registrations || registrations.length === 0) {
+      await session.abortTransaction();
+      return res.status(400).json({ success: false, message: "No active users registered for this event" });
+    }
+
+    // Deduplicate userIds
+    const uniqueUserIds = [...new Set(registrations.map(reg => reg.userId.toString()))];
+    const notifications = uniqueUserIds.map(userId => ({
+      eventId: id,
+      userId,
+      content: content.trim(),
+      read: false,
     }));
 
-    await EventNotification.insertMany(notifications);
+    await EventNotification.insertMany(notifications, { session });
 
-    res.status(201).json({
-      success: true,
-      message: "Notifications sent successfully!",
-    });
-  } catch (error) {
-    console.error("Error sending notifications:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error. Failed to send notifications.",
-    });
+    await session.commitTransaction();
+    res.status(200).json({ success: true, message: "Notifications sent successfully" });
+  } catch (err) {
+    await session.abortTransaction();
+    console.error("Error sending event notifications:", err);
+    res.status(500).json({ success: false, message: "Server error while sending notifications" });
+  } finally {
+    session.endSession();
   }
 };
 
-// Get notifications for a user
+// GET /api/notifications/event/:id
+export const getEventNotifications = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const notifications = await EventNotification.find({ eventId: id })
+      .populate("eventId", "title")
+      .sort({ createdAt: -1 });
+    res.status(200).json({ success: true, notifications });
+  } catch (err) {
+    console.error("Error fetching event notifications:", err);
+    res.status(500).json({ success: false, message: "Server error while fetching notifications" });
+  }
+};
+
+// GET /api/notifications/user
 export const getUserNotifications = async (req, res) => {
   try {
-    const userId = req.userId; // User making the request
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "User authentication required" });
+    }
 
-    const notifications = await EventNotification.find({ userId }).sort({ createdAt: -1 });
-
+    const notifications = await EventNotification.find({ userId })
+      .populate("eventId", "title")
+      .sort({ createdAt: -1 });
     res.status(200).json({ success: true, notifications });
-  } catch (error) {
-    console.error("Error retrieving notifications:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error. Failed to retrieve notifications.",
-    });
+  } catch (err) {
+    console.error("Error fetching user notifications:", err);
+    res.status(500).json({ success: false, message: "Server error while fetching user notifications" });
+  }
+};
+
+// PATCH /api/notifications/:id/read
+export const markNotificationAsRead = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "User authentication required" });
+    }
+
+    const notification = await EventNotification.findOne({ _id: id, userId });
+    if (!notification) {
+      return res.status(404).json({ success: false, message: "Notification not found or not authorized" });
+    }
+
+    notification.read = true;
+    await notification.save();
+
+    res.status(200).json({ success: true, message: "Notification marked as read" });
+  } catch (err) {
+    console.error("Error marking notification as read:", err);
+    res.status(500).json({ success: false, message: "Server error while marking notification as read" });
   }
 };
